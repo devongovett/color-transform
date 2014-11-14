@@ -46,6 +46,9 @@ The constructor accepts two parameters: source color space, and destination colo
 If you pipe another pixel-stream into `color-transform`, the source color space is optional
 in the constructor since it will be learned from the source stream.
 
+You don't need to worry about writing to the stream in whole pixel chunks. The ColorTransform stream
+will automatically buffer if there is a chunk boundary in the middle of a pixel.
+
 ```javascript
 // create a stream that converts from cmyk to rgb
 var s = new ColorTransform('cmyk', 'rgb');
