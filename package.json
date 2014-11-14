@@ -1,0 +1,35 @@
+{
+  "name": "color-transform",
+  "version": "1.0.0",
+  "description": "Streaming image color space transforms",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bl": "^0.9.3",
+    "pixel-stream": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/devongovett/color-transform.git"
+  },
+  "keywords": [
+    "pixel-stream",
+    "image",
+    "colorspace",
+    "color"
+  ],
+  "author": "Devon Govett <devongovett@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devongovett/color-transform/issues"
+  },
+  "homepage": "https://github.com/devongovett/color-transform"
+}
