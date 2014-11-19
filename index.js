@@ -16,26 +16,37 @@ function ColorTransform(a, b) {
   PixelStream.call(this);
    
   if (b) {
-    this._transformFn = ColorTransform.getTransformFunction(a, b);
-    this.colorSpace = b;
-    this._components = components[a];
+    this.format.colorSpace = a;
+    this._to = b;
   } else {
-    b = a;
+    this._to = a;
   }
   
   this.buffer = new BufferList;
-  
-  this.once('format', function() {
-    this._transformFn = ColorTransform.getTransformFunction(this.colorSpace, b);
-    this._components = components[this.colorSpace];
-    this.colorSpace = b;
-  });
 }
 
 util.inherits(ColorTransform, PixelStream);
 
+ColorTransform.prototype._start = function(done) {
+  try {
+    this._transformFn = ColorTransform.getTransformFunction(this.format.colorSpace, this._to);
+  } catch (err) {
+    return done(err);
+  }
+  
+  this._components = components[this.format.colorSpace];
+  this.format.colorSpace = this._to;
+  
+  // if the frame size is zero, then the width and height were never set
+  // this isn't really a problem for us, so just use 100x100.
+  if (this._frameSize === 0)
+    this._frameSize = 100 * 100 * this._components;
+  
+  done();
+};
+
 // Override pixel-stream's transform function because we don't need frame segmentation
-ColorTransform.prototype._transform = function(data, encoding, done) {
+ColorTransform.prototype._writePixels = function(data, done) {
   this.buffer.append(data);
     
   // make sure we have enough data
@@ -48,12 +59,6 @@ ColorTransform.prototype._transform = function(data, encoding, done) {
   }
   
   done();
-};
-
-// Override pixel-stream's addFrame method to just emit re-emit frame objects
-// since we overrode the _transform function which usually does this
-ColorTransform.prototype.addFrame = function(frame) {
-  this.emit('frame', frame);
 };
 
 ColorTransform.getTransformFunction = function(a, b) {

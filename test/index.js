@@ -109,9 +109,14 @@ describe('color-transform', function() {
   
   describe('stream', function() {
     it('throws an error if transform function doesn\'t exist', function() {
-      assert.throws(function() {
-        var s = new ColorTransform('rgba', 'unknown');
-      }, /Unsupported color conversion/);
+      var s = new ColorTransform('rgba', 'unknown');
+      
+      s.on('error', function(err) {
+        assert(err instanceof Error);
+        assert(/Unsupported color conversion/.test(err.message));
+      });
+      
+      s.end(new Buffer([ 250, 100, 4, 255, 0, 222, 3, 255 ]));
     });
         
     it('converts data', function(done) {
@@ -175,25 +180,16 @@ describe('color-transform', function() {
       s.end();
     });
     
-    it('emits frame objects', function() {
-      var s = new ColorTransform('rgba', 'rgb');
-      var emitted = false;
-      
-      s.once('frame', function() {
-        emitted = true;
-      });
-      
-      s.addFrame({ test: true });
-      assert(emitted);
-    });
-    
     it('supports constructor with a single argument for piping', function(done) {
       var p = new PassThrough;
-      p.width = p.height = 100;
-      p.colorSpace = 'rgba';
       var s = new ColorTransform('rgb');
       
       p.pipe(s);
+      p.emit('format', {
+        width: 100,
+        height: 100,
+        colorSpace: 'rgba'
+      });
       
       s.on('data', function(data) {
         assert.deepEqual(data, new Buffer([ 250, 100, 4, 0, 222, 3 ]));
