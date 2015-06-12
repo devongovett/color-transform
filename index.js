@@ -45,7 +45,6 @@ ColorTransform.prototype._start = function(done) {
   done();
 };
 
-// Override pixel-stream's transform function because we don't need frame segmentation
 ColorTransform.prototype._writePixels = function(data, done) {
   this.buffer.append(data);
     
